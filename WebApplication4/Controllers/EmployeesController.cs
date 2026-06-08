@@ -23,36 +23,24 @@ namespace WebApplication4.Controllers
             _employeeService = employeeService;
 		}
 
-        // GET: Employees
-        public async Task<IActionResult> Index(string keyword, string sort)
-        {
-			// 保留搜尋關鍵字
+		// GET: Employees
+		public async Task<IActionResult> Index(string keyword, string sort, int page = 1)
+		{
+			int pageSize = 5;
+
+			// 呼叫 Service 取得封裝好的資料
+			var model = await _employeeService.GetEmployeesAsync(keyword, sort, page, pageSize);
+
+			// 儲存狀態給 View 使用
 			ViewData["Keyword"] = keyword;
-			// 保留排序條件
+			ViewData["CurrentSort"] = sort;
 			ViewData["Sort"] = (sort == "title_asc") ? "title_desc" : "title_asc";
 
-			ViewData["CurrentSort"] = sort;
+			return View(model); // 直接傳入 PagedResult
+		}
 
-			var employees = _context.Employees.AsQueryable();
-
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                employees = employees.Where(e =>
-                e.LastName.Contains(keyword) || e.FirstName.Contains(keyword));
-            }
-
-			employees = sort switch
-			{
-				"title_desc" => employees.OrderByDescending(e => e.Title),
-				"title_asc" => employees.OrderBy(e => e.Title),
-				_ => employees.OrderBy(e => e.EmployeeId) //清除條件
-			};
-
-			return View(await employees.ToListAsync());
-        }
-
-        // GET: Employees/Details/5
-        public async Task<IActionResult> Details(int? id)
+		// GET: Employees/Details/5
+		public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {

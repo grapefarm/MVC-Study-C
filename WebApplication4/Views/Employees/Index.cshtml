@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebApplication4.Models.Employee>
+﻿@model WebApplication4.Common.PagedResult<WebApplication4.Models.Employee>
 
 @{
     ViewData["Title"] = "Index";
@@ -21,23 +21,24 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.Items)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Html.DisplayNameFor(model => model.Items)
             </th>
             <th>
                 <a asp-action="Index" 
                    asp-route-sort="@ViewData["Sort"]"
                    asp-route-keyword="@ViewData["Keyword"]">
-                    @Html.DisplayNameFor(model => model.Title)
+                    @Html.DisplayNameFor(model => model.Items)
                 </a>
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @foreach (var item in Model.Items)
+        {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.LastName)
@@ -57,3 +58,16 @@
 }
     </tbody>
 </table>
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-page="@i"
+                   asp-route-keyword="@ViewData["Keyword"]"
+                   asp-route-sort="@ViewData["CurrentSort"]">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
