@@ -109,7 +109,17 @@ namespace WebApplication4.Controllers
             {
                 return NotFound();
             }
-            return View(employee);
+
+			// 把撈出來的資料庫映射給vm
+			var vm = new EmployeeEditViewModel
+			{
+				EmployeeId = employee.EmployeeId,
+				LastName = employee.LastName,
+				FirstName = employee.FirstName,
+				Title = employee.Title
+			};
+
+			return View(vm);
         }
 
         // POST: Employees/Edit/5
@@ -117,34 +127,29 @@ namespace WebApplication4.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("EmployeeId,LastName,FirstName,Title,Username,Password,Role")] Employee employee)
+        public async Task<IActionResult> Edit(int id, EmployeeEditViewModel vm)
         {
-            if (id != employee.EmployeeId)
+            if (id != vm.EmployeeId)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(employee);
-                    await _context.SaveChangesAsync();
+				var employee = await _context.Employees.FindAsync(id);
+                if (employee == null) 
+                { 
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!EmployeeExists(employee.EmployeeId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+
+                employee.LastName = vm.LastName;
+                employee.FirstName = vm.FirstName;
+                employee.Title = vm.Title;
+
+                await _context.SaveChangesAsync();
+				return RedirectToAction(nameof(Index));
             }
-            return View(employee);
+            return View(vm);
         }
 
         // GET: Employees/Delete/5
