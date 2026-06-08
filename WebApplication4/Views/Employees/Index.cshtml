@@ -28,7 +28,11 @@
                 @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Username)
+                <a asp-action="Index" 
+                   asp-route-sort="@ViewData["Sort"]"
+                   asp-route-keyword="@ViewData["Keyword"]">
+                    @Html.DisplayNameFor(model => model.Username)
+                </a>
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Password)

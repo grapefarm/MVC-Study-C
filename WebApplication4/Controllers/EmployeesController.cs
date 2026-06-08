@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using WebApplication4.Models;
 
 namespace WebApplication4.Controllers
@@ -19,8 +20,13 @@ namespace WebApplication4.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index(string keyword)
+        public async Task<IActionResult> Index(string keyword, string sort)
         {
+			// 保留搜尋關鍵字
+			ViewData["Keyword"] = keyword;
+			// 保留排序條件
+			ViewData["Sort"] = (sort == "username_asc") ? "username_desc" : "username_asc";
+
             var employees = _context.Employees.AsQueryable();
 
             if (!string.IsNullOrEmpty(keyword))
@@ -29,8 +35,12 @@ namespace WebApplication4.Controllers
                 e.LastName.Contains(keyword) || e.FirstName.Contains(keyword));
             }
 
-            //保留搜尋關鍵字
-            ViewData["Keyword"] = keyword;
+			employees = sort switch
+			{
+				"username_desc" => employees.OrderByDescending(e => e.Username),
+				"username_asc" => employees.OrderBy(e => e.Username),
+				_ => employees.OrderBy(e => e.EmployeeId) //清除條件
+			};
 
 			return View(await employees.ToListAsync());
         }
