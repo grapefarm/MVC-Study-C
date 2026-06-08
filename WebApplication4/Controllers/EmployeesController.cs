@@ -29,9 +29,11 @@ namespace WebApplication4.Controllers
 			// 保留搜尋關鍵字
 			ViewData["Keyword"] = keyword;
 			// 保留排序條件
-			ViewData["Sort"] = (sort == "username_asc") ? "username_desc" : "username_asc";
+			ViewData["Sort"] = (sort == "title_asc") ? "title_desc" : "title_asc";
 
-            var employees = _context.Employees.AsQueryable();
+			ViewData["CurrentSort"] = sort;
+
+			var employees = _context.Employees.AsQueryable();
 
             if (!string.IsNullOrEmpty(keyword))
             {
@@ -41,8 +43,8 @@ namespace WebApplication4.Controllers
 
 			employees = sort switch
 			{
-				"username_desc" => employees.OrderByDescending(e => e.Username),
-				"username_asc" => employees.OrderBy(e => e.Username),
+				"title_desc" => employees.OrderByDescending(e => e.Title),
+				"title_asc" => employees.OrderBy(e => e.Title),
 				_ => employees.OrderBy(e => e.EmployeeId) //清除條件
 			};
 
@@ -86,10 +88,7 @@ namespace WebApplication4.Controllers
 				{
 					LastName = vm.LastName,
 					FirstName = vm.FirstName,
-					Title = vm.Title,
-					Username = vm.Username,
-                    Password = vm.Password,
-					Role = "Employee"
+					Title = vm.Title
 				};
 
 				_context.Add(employee);

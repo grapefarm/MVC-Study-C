@@ -13,87 +13,41 @@ public partial class NorthwindContext : DbContext
     {
     }
 
-    public virtual DbSet<Category> Categories { get; set; }
-
     public virtual DbSet<Employee> Employees { get; set; }
-
-    public virtual DbSet<Product> Products { get; set; }
-
-    public virtual DbSet<Supplier> Suppliers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Category>(entity =>
-        {
-            entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A2BCFD6A385");
-
-            entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
-            entity.Property(e => e.CategoryName)
-                .IsRequired()
-                .HasMaxLength(15);
-            entity.Property(e => e.Description).HasColumnType("ntext");
-        });
-
         modelBuilder.Entity<Employee>(entity =>
         {
-            entity.HasKey(e => e.EmployeeId).HasName("PK__Employee__7AD04FF1054CD0CD");
+            entity.HasIndex(e => e.LastName, "LastName");
 
-            entity.HasIndex(e => e.Username, "UQ__Employee__536C85E4C8C771F8").IsUnique();
+            entity.HasIndex(e => e.PostalCode, "PostalCode");
 
             entity.Property(e => e.EmployeeId).HasColumnName("EmployeeID");
+            entity.Property(e => e.Address).HasMaxLength(60);
+            entity.Property(e => e.BirthDate).HasColumnType("datetime");
+            entity.Property(e => e.City).HasMaxLength(15);
+            entity.Property(e => e.Country).HasMaxLength(15);
+            entity.Property(e => e.Extension).HasMaxLength(4);
             entity.Property(e => e.FirstName)
                 .IsRequired()
                 .HasMaxLength(10);
+            entity.Property(e => e.HireDate).HasColumnType("datetime");
+            entity.Property(e => e.HomePhone).HasMaxLength(24);
             entity.Property(e => e.LastName)
                 .IsRequired()
                 .HasMaxLength(20);
-            entity.Property(e => e.Password)
-                .IsRequired()
-                .HasMaxLength(100);
-            entity.Property(e => e.Role)
-                .IsRequired()
-                .HasMaxLength(20)
-                .HasDefaultValue("Employee");
+            entity.Property(e => e.Notes).HasColumnType("ntext");
+            entity.Property(e => e.Photo).HasColumnType("image");
+            entity.Property(e => e.PhotoPath).HasMaxLength(255);
+            entity.Property(e => e.PostalCode).HasMaxLength(10);
+            entity.Property(e => e.Region).HasMaxLength(15);
             entity.Property(e => e.Title).HasMaxLength(30);
-            entity.Property(e => e.Username)
-                .IsRequired()
-                .HasMaxLength(50);
-        });
+            entity.Property(e => e.TitleOfCourtesy).HasMaxLength(25);
 
-        modelBuilder.Entity<Product>(entity =>
-        {
-            entity.HasKey(e => e.ProductId).HasName("PK__Products__B40CC6ED034B8C12");
-
-            entity.Property(e => e.ProductId).HasColumnName("ProductID");
-            entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
-            entity.Property(e => e.ProductName)
-                .IsRequired()
-                .HasMaxLength(40);
-            entity.Property(e => e.QuantityPerUnit).HasMaxLength(20);
-            entity.Property(e => e.SupplierId).HasColumnName("SupplierID");
-            entity.Property(e => e.UnitPrice)
-                .HasDefaultValue(0m)
-                .HasColumnType("money");
-            entity.Property(e => e.UnitsInStock).HasDefaultValue((short)0);
-
-            entity.HasOne(d => d.Category).WithMany(p => p.Products)
-                .HasForeignKey(d => d.CategoryId)
-                .HasConstraintName("FK__Products__Catego__4F7CD00D");
-
-            entity.HasOne(d => d.Supplier).WithMany(p => p.Products)
-                .HasForeignKey(d => d.SupplierId)
-                .HasConstraintName("FK__Products__Suppli__4E88ABD4");
-        });
-
-        modelBuilder.Entity<Supplier>(entity =>
-        {
-            entity.HasKey(e => e.SupplierId).HasName("PK__Supplier__4BE66694A347D0A8");
-
-            entity.Property(e => e.SupplierId).HasColumnName("SupplierID");
-            entity.Property(e => e.CompanyName)
-                .IsRequired()
-                .HasMaxLength(40);
-            entity.Property(e => e.ContactName).HasMaxLength(30);
+            entity.HasOne(d => d.ReportsToNavigation).WithMany(p => p.InverseReportsToNavigation)
+                .HasForeignKey(d => d.ReportsTo)
+                .HasConstraintName("FK_Employees_Employees");
         });
 
         OnModelCreatingPartial(modelBuilder);
