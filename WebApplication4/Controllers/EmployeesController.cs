@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication4.Models;
+using WebApplication4.ViewModels;
 
 namespace WebApplication4.Controllers
 {
@@ -74,15 +75,25 @@ namespace WebApplication4.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EmployeeId,LastName,FirstName,Title,Username,Password,Role")] Employee employee)
+        public async Task<IActionResult> Create(EmployeeCreateViewModel vm)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(employee);
+				var employee = new Employee
+				{
+					LastName = vm.LastName,
+					FirstName = vm.FirstName,
+					Title = vm.Title,
+					Username = vm.Username,
+                    Password = vm.Password,
+					Role = "Employee"
+				};
+
+				_context.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(employee);
+            return View(vm);
         }
 
         // GET: Employees/Edit/5
