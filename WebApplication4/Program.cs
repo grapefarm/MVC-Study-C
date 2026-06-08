@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebApplication4.Models;
+using WebApplication4.Services;
 
 namespace WebApplication4
 {
@@ -11,7 +12,9 @@ namespace WebApplication4
 
 			// 註冊DbContext
 			builder.Services.AddDbContext<NorthwindContext>(options =>
-				options.UseSqlServer(builder.Configuration.GetConnectionString("NorthwindContext")));
+				options.UseSqlServer(builder.Configuration.GetConnectionString("NorthwindContext")));		
+			//註冊Employee服務
+			builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 			// Add services to the container.
 			builder.Services.AddControllersWithViews();

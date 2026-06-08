@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication4.Models;
+using WebApplication4.Services;
 using WebApplication4.ViewModels;
 
 namespace WebApplication4.Controllers
@@ -14,11 +15,13 @@ namespace WebApplication4.Controllers
     public class EmployeesController : Controller
     {
         private readonly NorthwindContext _context;
+		private readonly IEmployeeService _employeeService;
 
-        public EmployeesController(NorthwindContext context)
+		public EmployeesController(NorthwindContext context, IEmployeeService employeeService)
         {
             _context = context;
-        }
+            _employeeService = employeeService;
+		}
 
         // GET: Employees
         public async Task<IActionResult> Index(string keyword, string sort)
@@ -188,15 +191,8 @@ namespace WebApplication4.Controllers
 		[HttpPost]
 		public async Task<IActionResult> CanDelete(int id)
 		{
-			var employee = await _context.Employees.FindAsync(id);
-			if (employee == null) return NotFound();
-
-			if (employee.Role == "Admin")
-			{
-				return Json(new { canDelete = false, message = "安全提示：管理員不可刪除" });
-			}
-
-			return Json(new { canDelete = true });
+			var result = await _employeeService.CheckDelete(id);
+			return Json(new { canDelete = result.CanDelete, message = result.Message });
 		}
 
 		private bool EmployeeExists(int id)
