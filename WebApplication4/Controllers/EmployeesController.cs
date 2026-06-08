@@ -19,9 +19,20 @@ namespace WebApplication4.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string keyword)
         {
-            return View(await _context.Employees.ToListAsync());
+            var employees = _context.Employees.AsQueryable();
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                employees = employees.Where(e =>
+                e.LastName.Contains(keyword) || e.FirstName.Contains(keyword));
+            }
+
+            //保留搜尋關鍵字
+            ViewData["Keyword"] = keyword;
+
+			return View(await employees.ToListAsync());
         }
 
         // GET: Employees/Details/5
