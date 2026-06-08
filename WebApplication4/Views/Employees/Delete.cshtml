@@ -50,8 +50,31 @@
     </dl>
     
     <form asp-action="Delete">
-        <input type="hidden" asp-for="EmployeeId" />
+        <input type="hidden" asp-for="EmployeeId" id="targetId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <button type="button" class="btn btn-success" id="btnSafeDelete">安全刪除</button>
         <a asp-action="Index">Back to List</a>
     </form>
 </div>
+
+@section Scripts {
+    <script>
+        const btnSafeDelete = document.querySelector('#btnSafeDelete');
+        const employeeId = document.querySelector('#targetId').value;
+
+        btnSafeDelete.addEventListener('click', async function () {
+            const response = await fetch(`/Employees/CanDelete/${employeeId}`, {
+                method: 'POST'
+            });
+            const result = await response.json();
+
+            if (!result.canDelete) {
+                alert(result.message);
+                return;
+            }
+            if (confirm("確定要刪除這位員工嗎？")) {
+                document.querySelector('form').submit();
+            }
+        });
+    </script>
+}

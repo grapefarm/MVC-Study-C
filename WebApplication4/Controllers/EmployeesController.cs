@@ -185,9 +185,24 @@ namespace WebApplication4.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool EmployeeExists(int id)
+		[HttpPost]
+		public async Task<IActionResult> CanDelete(int id)
+		{
+			var employee = await _context.Employees.FindAsync(id);
+			if (employee == null) return NotFound();
+
+			if (employee.Role == "Admin")
+			{
+				return Json(new { canDelete = false, message = "安全提示：管理員不可刪除" });
+			}
+
+			return Json(new { canDelete = true });
+		}
+
+		private bool EmployeeExists(int id)
         {
             return _context.Employees.Any(e => e.EmployeeId == id);
         }
+
     }
 }
