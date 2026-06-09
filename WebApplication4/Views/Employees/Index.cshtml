@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
+    var employee = new WebApplication4.Models.Employee();
 }
 
 <h1>Index</h1>
@@ -21,16 +22,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Items)
+                @Html.DisplayNameFor(model => employee.LastName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Items)
+                @Html.DisplayNameFor(model => employee.FirstName)
             </th>
             <th>
                 <a asp-action="Index" 
                    asp-route-sort="@ViewData["Sort"]"
                    asp-route-keyword="@ViewData["Keyword"]">
-                    @Html.DisplayNameFor(model => model.Items)
+                    @Html.DisplayNameFor(model => employee.Title)
                 </a>
             </th>
             <th></th>
