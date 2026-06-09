@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebApplication4.Common;
 using WebApplication4.Models;
 using WebApplication4.Services;
 using WebApplication4.ViewModels;
@@ -26,17 +27,46 @@ namespace WebApplication4.Controllers
 		// GET: Employees
 		public async Task<IActionResult> Index(string keyword, string sort, int page = 1)
 		{
-			int pageSize = 5;
+			int pageSize = 5; // 設定每頁筆數
 
-			// 呼叫 Service 取得封裝好的資料
-			var model = await _employeeService.GetEmployeesAsync(keyword, sort, page, pageSize);
-
-			// 儲存狀態給 View 使用
+			// 保留搜尋關鍵字
 			ViewData["Keyword"] = keyword;
-			ViewData["CurrentSort"] = sort;
+			// 保留排序條件
 			ViewData["Sort"] = (sort == "title_asc") ? "title_desc" : "title_asc";
+			ViewData["CurrentSort"] = sort;
 
-			return View(model); // 直接傳入 PagedResult
+			var employees = _context.Employees.AsQueryable();
+
+			// 搜尋邏輯
+			if (!string.IsNullOrEmpty(keyword))
+			{
+				employees = employees.Where(e =>
+				e.LastName.Contains(keyword) || e.FirstName.Contains(keyword));
+			}
+
+			// 計算總筆數 (用於分頁計算)
+			int totalCount = await employees.CountAsync();
+
+			// 排序邏輯
+			employees = sort switch
+			{
+				"title_desc" => employees.OrderByDescending(e => e.Title),
+				"title_asc" => employees.OrderBy(e => e.Title),
+				_ => employees.OrderBy(e => e.EmployeeId)
+			};
+
+			// 分頁邏輯
+			var items = await employees.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+
+			// 封裝結果
+			var result = new PagedResult<Employee>
+			{
+				Items = items,
+				PageNumber = page,
+				TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+			};
+
+			return View(result);
 		}
 
 		// GET: Employees/Details/5
