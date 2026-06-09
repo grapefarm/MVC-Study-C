@@ -15,7 +15,10 @@ public partial class Employee
 
     public string Title { get; set; }
 
-    public string TitleOfCourtesy { get; set; }
+    //新增
+	public bool IsDeleted { get; set; }
+
+	public string TitleOfCourtesy { get; set; }
 
     public DateTime? BirthDate { get; set; }
 

@@ -19,6 +19,7 @@ public partial class NorthwindContext : DbContext
     {
         modelBuilder.Entity<Employee>(entity =>
         {
+			entity.HasQueryFilter(e => !e.IsDeleted);
             entity.HasIndex(e => e.LastName, "LastName");
 
             entity.HasIndex(e => e.PostalCode, "PostalCode");

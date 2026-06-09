@@ -166,12 +166,20 @@ namespace WebApplication4.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var employee = await _context.Employees.FindAsync(id);
+            
             if (employee != null)
             {
-                _context.Employees.Remove(employee);
-            }
+				//外鍵衝突解法 2026/6/9
+				//ALTER TABLE Employees ADD IsDeleted bit NOT NULL DEFAULT 0;
+				//public bool IsDeleted { get; set; }
+				//.Where(e => !e.IsDeleted)
+				//或者去DbContext的OnModelCreating裡面加上全域過濾器
+				//entity.HasQueryFilter(e => !e.IsDeleted);
+                //
+				employee.IsDeleted = true;
+				await _context.SaveChangesAsync();
+			}
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
