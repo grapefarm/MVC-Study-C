@@ -28,15 +28,15 @@ namespace WebApplication4.Controllers
 		{
 			int pageSize = 5;
 
-			// 呼叫 Service 取得封裝好的資料
-			var model = await _employeeService.GetEmployeesAsync(keyword, sort, page, pageSize);
-
 			// 儲存狀態給 View 使用
 			ViewData["Keyword"] = keyword;
 			ViewData["CurrentSort"] = sort;
 			ViewData["Sort"] = (sort == "title_asc") ? "title_desc" : "title_asc";
 
-			return View(model); // 直接傳入 PagedResult
+			// 呼叫 Service 取得封裝好的資料
+			var result = await _employeeService.GetEmployeesAsync(keyword, sort, page, pageSize);
+
+			return View(result); // 直接傳入 PagedResult
 		}
 
 		// GET: Employees/Details/5

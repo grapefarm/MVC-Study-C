@@ -28,27 +28,27 @@ namespace WebApplication4.Services
 
 		public async Task<PagedResult<Employee>> GetEmployeesAsync(string keyword, string sort, int page, int pageSize)
 		{
-			var query = _context.Employees.AsQueryable();
+			var employees = _context.Employees.AsQueryable();
 
 			// 搜尋
 			if (!string.IsNullOrEmpty(keyword))
 			{
-				query = query.Where(e => e.LastName.Contains(keyword) || e.FirstName.Contains(keyword));
+				employees = employees.Where(e => e.LastName.Contains(keyword) || e.FirstName.Contains(keyword));
 			}
 
 			// 總筆數 (計算分頁用)
-			int totalCount = await query.CountAsync();
+			int totalCount = await employees.CountAsync();
 
 			// 排序
-			query = sort switch
+			employees = sort switch
 			{
-				"title_desc" => query.OrderByDescending(e => e.Title),
-				"title_asc" => query.OrderBy(e => e.Title),
-				_ => query.OrderBy(e => e.EmployeeId)
+				"title_desc" => employees.OrderByDescending(e => e.Title),
+				"title_asc" => employees.OrderBy(e => e.Title),
+				_ => employees.OrderBy(e => e.EmployeeId)
 			};
 
 			// 分頁
-			var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+			var items = await employees.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
 			return new PagedResult<Employee>
 			{
